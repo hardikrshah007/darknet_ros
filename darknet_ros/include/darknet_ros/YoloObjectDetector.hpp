@@ -197,6 +197,7 @@ class YoloObjectDetector {
   int waitKeyDelay_;
   int fullScreen_;
   char* demoPrefix_;
+  int prevSeq_;
 
   std_msgs::Header imageHeader_;
   cv::Mat camImageCopy_;

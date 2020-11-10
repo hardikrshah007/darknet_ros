@@ -1,5 +1,5 @@
 ## This branch is for YOLO DQN ##
-
+rosrun topic_tools_dqn throttle messages /realsense/color/image_raw 10 /realsense/color/image_raw/remapped
 # YOLO ROS: Real-Time Object Detection for ROS
 
 ## Overview

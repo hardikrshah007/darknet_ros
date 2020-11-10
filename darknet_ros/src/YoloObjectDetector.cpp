@@ -441,7 +441,7 @@ void YoloObjectDetector::yolo() {
 
   std::thread detect_thread;
   std::thread fetch_thread;
-
+  std::thread publish_thread;
   srand(2222222);
 
   int i;
@@ -488,8 +488,34 @@ void YoloObjectDetector::yolo() {
   while (!demoDone_) {
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
-    detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
-    if (!demoPrefix_) {
+    // detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+    if (prevSeq_ != headerBuff_[buffIndex_].seq)
+    {
+      detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+
+      fps_ = 1./(what_time_is_it_now() - demoTime_);
+      demoTime_ = what_time_is_it_now();
+      printf("\nFPS:%.1f\n",fps_);
+
+      if (viewImage_) 
+      {
+        displayInThread(0);
+      }
+
+      publish_thread = std::thread(&YoloObjectDetector::publishInThread, this);
+
+      prevSeq_ = headerBuff_[buffIndex_].seq;
+
+      fetch_thread.join();
+      detect_thread.join();
+      publish_thread.join();
+      ++count;
+    }
+    else
+    {
+      fetch_thread.join();  
+    }
+   /** if (!demoPrefix_) {
       fps_ = 1. / (what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
       if (viewImage_) {
@@ -505,7 +531,7 @@ void YoloObjectDetector::yolo() {
     }
     fetch_thread.join();
     detect_thread.join();
-    ++count;
+    ++count;**/
     if (!isNodeRunning()) {
       demoDone_ = true;
     }
